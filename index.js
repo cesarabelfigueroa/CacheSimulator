@@ -1,5 +1,5 @@
 let _ = require('lodash');
-let Manager = require('./FileSystem');
+let Manager = require('./core/FileSystem');
 let Promise = require("bluebird");
 let FileSystem = new Manager();
 let config = require('./config.json');
@@ -30,5 +30,3 @@ let write = (direction, type) =>{
 }
 
 
-sort(RAM);
-console.log(RAM);
