@@ -3,8 +3,8 @@ let Manager = require('./FileSystem');
 let Promise = require("bluebird");
 let FileSystem = new Manager();
 let config = require('./config.json');
-let data = FileSystem.read("./assets/database.txt");
-FileSystem.exportToExcel("example.xlsx");
+let RAM = FileSystem.read("./assets/database.txt");
+let CACHE = {};
 
 
 let sort = (data) => {
@@ -19,10 +19,16 @@ let sort = (data) => {
     }
 };
 
-let read = (position, type) => {
-    return 0;
+let read = (direction, type) => {
+	
+
+
 };
 
-let write = (position, type) =>{
+let write = (direction, type) =>{
     return 0;
 }
+
+
+sort(RAM);
+console.log(RAM);
