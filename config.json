@@ -3,11 +3,19 @@
 	"cache": 1024,
 	"block": 8,
 	"sets": 4,
-	"type": 0,
+	"types":{ 
+		"0": "sin cache",
+		"1": "directo",
+		"2": "asociativa",
+		"3": "asociativa por conjuntos"
+	},
 	"times": {
 		"0": 0.1,
 		"1": 0.01,
 		"2": 0.11,
 		"3": 0.22
-	}
+	},
+	"k": 8,
+	"m": 127
 }
+
