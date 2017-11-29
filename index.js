@@ -15,7 +15,7 @@ let modify = {};
 let label = {};
 
 
-let sort = (data) => {
+let execute = () => {
     let result = {};
     //   for (const type in config.types) {
     let type = config.types[1];
@@ -52,6 +52,7 @@ let read = (direction, type) => {
             result = directRead(direction);
             break
         case "asociativa":
+            result = associativeRead(direction);
             break
         case "asociativa por conjuntos":
             break
@@ -70,18 +71,34 @@ let write = (direction, type, value) => {
             result = directWrite(direction,value);
             break
         case "asociativa":
+         result = associativeWrite(direction,value);
             break
         case "asociativa por conjuntos":
             break
     }
 };
 
+let associativeRead = (direction) => {
+    let block = Math.trunc(direction / config.k)
+    wordD = direction % config.k;
+    labelD = Math.trunc(block / config.m)
+    line = block % config.m;
+    return RAM[direction];
+};
+
+let associativeWrite = (direction, value) => {
+    let block = Math.trunc(direction / config.k)
+    wordD = direction % config.k
+    labelD = Math.trunc(block / config.m)
+    line = block % config.m;
+    RAM[direction] = value;
+}
+
 let directRead = (direction) => {
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k;
     labelD = Math.trunc(block / config.m)
     line = block % config.m;
-
     if (valid[line]) {
         if (label[line] == labelD) {
             time += 0.01;
@@ -93,7 +110,6 @@ let directRead = (direction) => {
                 time += 0.11;
                 valid[line] = true;
             }
-
             label[line] = labelD;
         }
     } else {
@@ -145,4 +161,4 @@ let writeWithOutCahe = (direction, value) => {
 };
 
 
-sort(RAM);
+execute();
