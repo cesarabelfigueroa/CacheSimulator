@@ -38,7 +38,7 @@ let execute = () => {
     console.log(result);
     RAM = fileContent;
 
-  //  console.log(result);
+    //  console.log(result);
 
 
     //}
@@ -96,10 +96,10 @@ let associativeRead = (direction) => {
             time += 0.11;
             valid[lx] = true;
             modify[lx] = false;
-        }else{
+        } else {
             lx = getNextIndex();
             if (modify[lx]) {
-                time += 0.22;   
+                time += 0.22;
             } else {
                 time += 0.11;
             }
@@ -124,18 +124,18 @@ let associativeWrite = (direction, value) => {
         if (!valid[lx]) {
             time += 0.11;
             valid[lx] = true;
-        }else{
-            lx=getNextIndex();
-            if(modify[lx]){
-                time+=0.22;
-            }else{
-                modify[lx]=true;
-                time+=0.11;
+        } else {
+            lx = getNextIndex();
+            if (modify[lx]) {
+                time += 0.22;
+            } else {
+                modify[lx] = true;
+                time += 0.11;
             }
             modify[lx] = true;
         }
     }
-    label[lx]=labelD;
+    label[lx] = labelD;
     RAM[direction] = value;
 };
 
