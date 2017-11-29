@@ -7,18 +7,23 @@ let fileContent = FileSystem.read("./assets/database.txt");
 let RAM = fileContent.slice();
 let time = 0;
 var result = {};
-let CACHE = {
 
-};
+let valid = {};
+
+let modify = {};
+
+let label = {};
+
 
 let sort = (data) => {
     let result = {};
     //   for (const type in config.types) {
-    let type = config.types[0];
+    let type = config.types[1];
     time = 0;
     for (let i = 0; i < config.ram - 1; i++) {
         for (let j = i + 1; j < config.ram; j++) {
             if (read(i, type) > read(j, type)) {
+                
                 let value = read(i, type);
                 write(i, type, read(j, type));
                 write(j, type, value);
@@ -30,8 +35,7 @@ let sort = (data) => {
     result[type] = {
         time: time
     };
-
-    console.log(result);
+    console.log(RAM);
     RAM = fileContent;
 
     // console.log(result);
@@ -46,7 +50,7 @@ let read = (direction, type) => {
         case "sin cache":
             result = readWithOutCahe(direction);
             break
-        case "directa":
+        case "directo":
             result = directRead(direction);
             break
         case "asociativa":
@@ -65,8 +69,8 @@ let write = (direction, type, value) => {
         case "sin cache":
             result = writeWithOutCahe(direction, value);
             break
-        case "directa":
-            result = directRead(direction);
+        case "directo":
+            result = directWrite(direction,value);
             break
         case "asociativa":
             break
@@ -76,17 +80,57 @@ let write = (direction, type, value) => {
 };
 
 let directRead = (direction) => {
-    let pd = math.trunc(direction / config.k),
-        ed = math.trunc(direction / config.m);
-    let line = d % config.m;
+    let block = Math.trunc(direction / config.k)
+    wordD = direction % config.k
+    labelD = Math.trunc(block / config.m)
+    line = block % config.m;
 
-    if (true) {
-        return CACHE[line][pd];
+    if (valid[line]) {
+        if (label[line] == labelD) {
+            time += 0.01;
+        } else {
+            if (modify[line]) {
+                time += 0.22;
+                valid[line] = true;
+            } else {
+                time += 0.11;
+                valid[line] = true;
+            }
+        }
     } else {
-
+        time += 0.11;
+        valid[line] = true;
     }
+    return RAM[direction];
 };
 
+let directWrite = (direction, value) => {
+    let block = Math.trunc(direction / config.k)
+    wordD = direction % config.k
+    labelD = Math.trunc(block / config.m)
+    line = block % config.m;
+
+    if (valid[line]) {
+        if (label[line] == labelD) {
+            time += 0.01;
+            modify[line] = true;
+        } else {
+            if (modify[line]) {
+                time += 0.22;
+                valid[line] = true;
+            } else {
+                time += 0.11;
+                valid[line] = true;
+                modify[line] = true;
+            }
+        }
+    } else {
+        time += 0.11;
+        valid[line] = true;
+        modify[line]= true;
+    }
+    RAM[direction] = value;
+}
 
 let readWithOutCahe = (direction) => {
     time += 0.1;
