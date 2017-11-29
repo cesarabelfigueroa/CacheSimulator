@@ -34,12 +34,19 @@ let execute = () => {
     result[type] = {
         time: time
     };
-    RAM = fileContent;
 
     console.log(result);
+    RAM = fileContent;
+
+  //  console.log(result);
 
 
     //}
+};
+
+let getNextIndex = () => {
+    index++;
+    return index;
 };
 
 let read = (direction, type) => {
@@ -57,7 +64,6 @@ let read = (direction, type) => {
         case "asociativa por conjuntos":
             break
     }
-
     return result;
 };
 
@@ -79,11 +85,9 @@ let write = (direction, type, value) => {
 };
 
 let associativeRead = (direction) => {
-
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k;
-    labelD = Math.trunc(block / config.m)
-    line = block % config.m;
+    labelD = Math.trunc(block / config.m);
     let lx = index;
     if (valid[lx] && label[lx] == labelD) {
         time += 0.01;
@@ -92,29 +96,24 @@ let associativeRead = (direction) => {
             time += 0.11;
             valid[lx] = true;
             modify[lx] = false;
+        }else{
+            lx = getNextIndex();
+            if (modify[lx]) {
+                time += 0.22;   
+            } else {
+                time += 0.11;
+            }
+            modify[lx] = false;
         }
-
-        lx = getNextIndex();
-        if (modify[lx]) {
-            time += 0.22;
-            
-        } else {
-            time += 0.11;
-        }
-        modify[lx] = false;
-
     }
     label[lx] = labelD;
     return RAM[direction];
 };
-let getNextIndex = () => {
-    return index++;
 
-}
 
 let associativeWrite = (direction, value) => {
     let block = Math.trunc(direction / config.k)
-    wordD = direction % config.k
+    wordD = direction % config.k;
     labelD = Math.trunc(block / config.m)
     line = block % config.m;
     let lx = index;
@@ -125,26 +124,25 @@ let associativeWrite = (direction, value) => {
         if (!valid[lx]) {
             time += 0.11;
             valid[lx] = true;
-           
-        }
-        lx=getNextIndex();
-        if(modify[lx]){
-            time+=0.22;
         }else{
-            modify[lx]=true;
-            time+=0.11;
+            lx=getNextIndex();
+            if(modify[lx]){
+                time+=0.22;
+            }else{
+                modify[lx]=true;
+                time+=0.11;
+            }
+            modify[lx] = true;
         }
-        modify[lx] = true;
     }
     label[lx]=labelD;
     RAM[direction] = value;
-
-}
+};
 
 let directRead = (direction) => {
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k;
-    labelD = Math.trunc(block / config.m)
+    labelD = Math.trunc(block / config.m);
     line = block % config.m;
     if (valid[line]) {
         if (label[line] == labelD) {
@@ -170,7 +168,7 @@ let directRead = (direction) => {
 let directWrite = (direction, value) => {
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k
-    labelD = Math.trunc(block / config.m)
+    labelD = Math.trunc(block / config.m);
     line = block % config.m;
     if (valid[line]) {
         if (label[line] == labelD) {
