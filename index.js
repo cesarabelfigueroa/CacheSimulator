@@ -11,19 +11,19 @@ var result = {};
 let valid = {};
 
 let modify = {};
-
+let index = 0;
 let label = {};
 
 
 let execute = () => {
     let result = {};
     //   for (const type in config.types) {
-    let type = config.types[1];
+    let type = config.types[2];
     time = 0;
     for (let i = 0; i < config.ram - 1; i++) {
         for (let j = i + 1; j < config.ram; j++) {
             if (read(i, type) > read(j, type)) {
-                let value = read(i, type);           
+                let value = read(i, type);
                 write(i, type, read(j, type));
                 write(j, type, value);
             }
@@ -68,10 +68,10 @@ let write = (direction, type, value) => {
             result = writeWithOutCahe(direction, value);
             break
         case "directo":
-            result = directWrite(direction,value);
+            result = directWrite(direction, value);
             break
         case "asociativa":
-         result = associativeWrite(direction,value);
+            result = associativeWrite(direction, value);
             break
         case "asociativa por conjuntos":
             break
@@ -79,19 +79,66 @@ let write = (direction, type, value) => {
 };
 
 let associativeRead = (direction) => {
+
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k;
     labelD = Math.trunc(block / config.m)
     line = block % config.m;
+    let lx = index;
+    if (valid[lx] && label[lx] == labelD) {
+        time += 0.01;
+    } else {
+        if (!valid[lx]) {
+            time += 0.11;
+            valid[lx] = true;
+            modify[lx] = false;
+        }
+
+        lx = getNextIndex();
+        if (modify[lx]) {
+            time += 0.22;
+            
+        } else {
+            time += 0.11;
+        }
+        modify[lx] = false;
+
+    }
+    label[lx] = labelD;
     return RAM[direction];
 };
+let getNextIndex = () => {
+    return index++;
+
+}
 
 let associativeWrite = (direction, value) => {
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k
     labelD = Math.trunc(block / config.m)
     line = block % config.m;
+    let lx = index;
+    if (valid[lx] && label[lx] == labelD) {
+        modify[lx] = true;
+        time += 0.01;
+    } else {
+        if (!valid[lx]) {
+            time += 0.11;
+            valid[lx] = true;
+           
+        }
+        lx=getNextIndex();
+        if(modify[lx]){
+            time+=0.22;
+        }else{
+            modify[lx]=true;
+            time+=0.11;
+        }
+        modify[lx] = true;
+    }
+    label[lx]=labelD;
     RAM[direction] = value;
+
 }
 
 let directRead = (direction) => {
@@ -144,7 +191,7 @@ let directWrite = (direction, value) => {
     } else {
         time += 0.11;
         valid[line] = true;
-        modify[line]= true;
+        modify[line] = true;
         label[line] = labelD;
     }
     RAM[direction] = value;
