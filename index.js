@@ -17,31 +17,30 @@ let label = {};
 
 let execute = () => {
     let result = {};
-    //   for (const type in config.types) {
-    let type = config.types[2];
-    time = 0;
-    for (let i = 0; i < config.ram - 1; i++) {
-        for (let j = i + 1; j < config.ram; j++) {
-            if (read(i, type) > read(j, type)) {
-                let value = read(i, type);
-                write(i, type, read(j, type));
-                write(j, type, value);
+    for (let type in config.types) {
+
+        type = config.types[type];
+        time = 0;
+        for (let i = 0; i < config.ram - 1; i++) {
+            for (let j = i + 1; j < config.ram; j++) {
+                if (read(i, type) > read(j, type)) {
+                    let value = read(i, type);
+                    write(i, type, read(j, type));
+                    write(j, type, value);
+                }
             }
         }
-    }
 
 
-    result[type] = {
-        time: time
+        valid = {};
+        modify = {};
+        index = 0;
+        label = {};
+        RAM = fileContent.slice();
+        result[type] = time;
     };
 
     console.log(result);
-    RAM = fileContent;
-
-    //  console.log(result);
-
-
-    //}
 };
 
 let getNextIndex = () => {
@@ -106,6 +105,7 @@ let associativeRead = (direction) => {
             modify[lx] = false;
         }
     }
+    valid[lx] = true;
     label[lx] = labelD;
     return RAM[direction];
 };
@@ -114,7 +114,7 @@ let associativeRead = (direction) => {
 let associativeWrite = (direction, value) => {
     let block = Math.trunc(direction / config.k)
     wordD = direction % config.k;
-    labelD = Math.trunc(block / config.m)
+    labelD = Math.trunc(block / config.m);
     line = block % config.m;
     let lx = index;
     if (valid[lx] && label[lx] == labelD) {
@@ -135,6 +135,7 @@ let associativeWrite = (direction, value) => {
             modify[lx] = true;
         }
     }
+    valid[lx] = true;
     label[lx] = labelD;
     RAM[direction] = value;
 };
@@ -167,7 +168,7 @@ let directRead = (direction) => {
 
 let directWrite = (direction, value) => {
     let block = Math.trunc(direction / config.k)
-    wordD = direction % config.k
+    wordD = direction % config.k;
     labelD = Math.trunc(block / config.m);
     line = block % config.m;
     if (valid[line]) {
@@ -193,7 +194,7 @@ let directWrite = (direction, value) => {
         label[line] = labelD;
     }
     RAM[direction] = value;
-}
+};
 
 let readWithOutCahe = (direction) => {
     time += 0.1;
