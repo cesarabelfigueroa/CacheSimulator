@@ -7,9 +7,7 @@ let fileContent = FileSystem.read("./assets/database.txt");
 let RAM = fileContent.slice();
 let time = 0;
 var result = {};
-
 let valid = {};
-
 let modify = {};
 let index = 0;
 let label = {};
@@ -44,8 +42,7 @@ let execute = () => {
 };
 
 let getNextIndex = () => {
-    index++;
-    return index;
+    return ++index;
 };
 
 let read = (direction, type) => {
@@ -84,7 +81,7 @@ let write = (direction, type, value) => {
 };
 
 let associativeRead = (direction) => {
-    let block = Math.trunc(direction / config.k)
+    let block = Math.trunc(direction / config.k);
     wordD = direction % config.k;
     labelD = Math.trunc(block / config.m);
     let lx = index;
@@ -112,10 +109,10 @@ let associativeRead = (direction) => {
 
 
 let associativeWrite = (direction, value) => {
-    let block = Math.trunc(direction / config.k)
-    wordD = direction % config.k;
-    labelD = Math.trunc(block / config.m);
-    line = block % config.m;
+    let block = Math.trunc(direction / config.k);
+    let wordD = direction % config.k;
+    let labelD = Math.trunc(block / config.m);
+    let line = block % config.m;
     let lx = index;
     if (valid[lx] && label[lx] == labelD) {
         modify[lx] = true;
@@ -141,10 +138,10 @@ let associativeWrite = (direction, value) => {
 };
 
 let directRead = (direction) => {
-    let block = Math.trunc(direction / config.k)
-    wordD = direction % config.k;
-    labelD = Math.trunc(block / config.m);
-    line = block % config.m;
+    let block = Math.trunc(direction / config.k);
+    let wordD = direction % config.k;
+    let labelD = Math.trunc(block / config.m);
+    let line = block % config.m;
     if (valid[line]) {
         if (label[line] == labelD) {
             time += 0.01;
