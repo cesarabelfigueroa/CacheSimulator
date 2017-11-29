@@ -23,8 +23,7 @@ let sort = (data) => {
     for (let i = 0; i < config.ram - 1; i++) {
         for (let j = i + 1; j < config.ram; j++) {
             if (read(i, type) > read(j, type)) {
-                
-                let value = read(i, type);
+                let value = read(i, type);           
                 write(i, type, read(j, type));
                 write(j, type, value);
             }
@@ -35,10 +34,9 @@ let sort = (data) => {
     result[type] = {
         time: time
     };
-    console.log(RAM);
     RAM = fileContent;
 
-    // console.log(result);
+    console.log(result);
 
 
     //}
@@ -59,7 +57,6 @@ let read = (direction, type) => {
             break
     }
 
-    //console.log(result);
     return result;
 };
 
@@ -81,7 +78,7 @@ let write = (direction, type, value) => {
 
 let directRead = (direction) => {
     let block = Math.trunc(direction / config.k)
-    wordD = direction % config.k
+    wordD = direction % config.k;
     labelD = Math.trunc(block / config.m)
     line = block % config.m;
 
@@ -96,10 +93,13 @@ let directRead = (direction) => {
                 time += 0.11;
                 valid[line] = true;
             }
+
+            label[line] = labelD;
         }
     } else {
         time += 0.11;
         valid[line] = true;
+        label[line] = labelD;
     }
     return RAM[direction];
 };
@@ -109,7 +109,6 @@ let directWrite = (direction, value) => {
     wordD = direction % config.k
     labelD = Math.trunc(block / config.m)
     line = block % config.m;
-
     if (valid[line]) {
         if (label[line] == labelD) {
             time += 0.01;
@@ -123,18 +122,20 @@ let directWrite = (direction, value) => {
                 valid[line] = true;
                 modify[line] = true;
             }
+
+            label[line] = labelD;
         }
     } else {
         time += 0.11;
         valid[line] = true;
         modify[line]= true;
+        label[line] = labelD;
     }
     RAM[direction] = value;
 }
 
 let readWithOutCahe = (direction) => {
     time += 0.1;
-    // console.log(direction, RAM[direction]);
     return RAM[direction];
 };
 
