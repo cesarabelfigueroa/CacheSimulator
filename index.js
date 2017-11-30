@@ -11,6 +11,8 @@ let valid = {};
 let modify = {};
 let index = 0;
 let label = {};
+let tag = {};
+let set = {};
 
 
 let execute = () => {
@@ -58,6 +60,7 @@ let read = (direction, type) => {
             result = associativeRead(direction);
             break
         case "asociativa por conjuntos":
+            result = associativeByBlocksRead(direction);
             break
     }
     return result;
@@ -76,14 +79,75 @@ let write = (direction, type, value) => {
             result = associativeWrite(direction, value);
             break
         case "asociativa por conjuntos":
+            result = associativeByBlocksWrite(direction, value);
             break
     }
 };
 
+let associativeByBlocksRead = (direction) => {
+    let InnerBlock, InnerTag, InnerSet, InnerWord;
+    InnerBlock = direction >> 3 & 511; //9 bits para el bloque, el bloque es la etiqueta y el conjunto merged
+
+    InnerTag = direction >> 5 & 127; //7 bits para la etiqueta
+    InnerSet = direction >> 3 & 3; //2 bits para el conjunto
+    InnerWord = direction & 7; //2 bits para la palabra
+    if (valid[InnerBlock / 16]) {
+        if (tag[InnerBlock / 16] != InnerBlock) {
+            if (modify[InnerBlock / 16]) { //Para saber donde empieza el bloque se divide la direccion entre 8 y se multiplica por ocho en un int de java para que solo agarre la parte entera de la division
+                time += (0.22)*8;
+                modify[InnerBlock / 16] = false;
+            }else{
+                time += (0.11)*8;
+            }
+        }else{
+            time += 0.01;
+        }
+    } else {
+        tag[InnerBlock / 16] = InnerBlock;
+        set[InnerBlock / 16] = InnerSet;
+        time += (0.011)*8;
+    }
+  
+    return RAM[direction];
+};
+
+let associativeByBlocksWrite = (direction, value) => {
+    let InnerBlock, InnerTag, InnerSet, InnerWord;
+    InnerBlock = direction >>  3 & 511; //9 bits para el bloque, el bloque es la etiqueta y el conjunto merged
+    InnerTag = direction >> 5 & 127; //7 bits para la etiqueta
+    InnerSet = direction >> 3 & 3; //2 bits para el conjunto
+    InnerWord = direction & 7; //2 bits para la palabra
+    if (valid[InnerBlock / 16]) { //Es Valido
+        if (tag[InnerBlock / 16] != InnerBlock) { //No esta en Cache
+            if (modify[InnerBlock / 16]) { //Esta Modificado
+                for (let i = 0; i < 8; i++) {
+                    time += 0.011;
+                }
+                modify[InnerTag / 16] = false;
+            }
+            for (let i = 0; i < 8; i++) {
+                tag[InnerBlock / 16] = InnerBlock;
+                set[InnerBlock / 16] = InnerSet;
+                time += 0.011;
+            }
+        }
+    } else { //No es Valido
+        for (let i = 0; i < 8; i++) {
+            tag[InnerBlock / 16] = InnerBlock;
+            set[InnerBlock / 16] = InnerSet;
+            time += 0.011;
+        }
+        valid[InnerBlock / 16] = true;
+    }
+    modify[InnerBlock / 16] = true;
+    time += 0.001;
+    RAM[direction] = value;
+}
+
 let associativeRead = (direction) => {
     let block = Math.trunc(direction / config.k);
-    wordD = direction % config.k;
-    labelD = Math.trunc(block / config.m);
+    let wordD = direction % config.k;
+    let labelD = Math.trunc(block / config.m);
     let lx = index;
     if (valid[lx] && label[lx] == labelD) {
         time += 0.01;
